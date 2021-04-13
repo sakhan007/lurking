@@ -41,13 +41,26 @@ def create_app(test_config=None):
     # Flask does not create instance folder automatically but it is required since sqlite
     # file will be created there.
     try:
-        os.mkdirs(app.instance_path)
+        os.makedirs(app.instance_path)
     except OSError:
         pass
     # This is how a simple route is created so that we can see the application working.
-    # it creates a connection between the URL /hellow and a function that returns a response, the string 'hello, world!' in this case.
+    # it creates a connection between the URL /hellow and a function that returns a response, the string 'hello, world!'
+    #in this case.
     # simple page that says hello
     @app.route('/hello')
     def hello():
         return 'Hello, World!'
+    from . import db
+    db.init_app(app)
+
+    # registering the auth blueprint from factory using app.register_blueprint()
+    from . import auth
+    app.register_blueprint(auth.bp)
+
+    # registering the blog blueprint
+    from . import blog
+    app.register_blueprint(blog.bp)
+    app.add_url_rule('/', endpoint='index')
+
     return app
